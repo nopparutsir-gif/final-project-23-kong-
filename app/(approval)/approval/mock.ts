@@ -10,7 +10,7 @@ interface PendingRequest {
   category: string;
 }
 
-interface UnitRequest {
+export interface UnitRequest {
   id: string;
   title: string;
   by: string;
@@ -31,7 +31,6 @@ export const PENDING: PendingRequest[] = [
 // ข้อมูลตัวอย่างสำหรับสรุปใน approval/page.tsx และหน้ารวม/หน้ารายละเอียดใน unit/page.tsx กับ unit/unitView/page.tsx
 export const IN_UNIT: UnitRequest[] = [
   { id: "REQ-2611-011", title: "ขออนุมัติฝึกอบรมความปลอดภัยในการทำงาน", by: "นภา อินทร์แก้ว", dept: "ฝ่ายผลิต", date: "8 พ.ย. 2569", status: "กำลังดำเนินการ", category: "พัฒนาใหม่", progress: 40 },
-  { id: "REQ-2610-087", title: "ขอเปลี่ยนคอมพิวเตอร์ประจำโต๊ะ 5 เครื่อง", by: "ธนา วงศ์สว่าง", dept: "ฝ่ายขาย", date: "28 ต.ค. 2569", status: "อนุมัติแล้ว", category: "แก้ปัญหา", progress: 80 },
   { id: "REQ-2610-080", title: "ขอซื้อวัสดุสำนักงานประจำไตรมาส 4", by: "สมชาย ใจดี", dept: "ฝ่ายคลังสินค้า", date: "25 ต.ค. 2569", status: "เสร็จสิ้น", category: "ปรับปรุง", progress: 100 },
   { id: "REQ-2610-071", title: "ขอเพิ่มอัตรากำลังพนักงานชั่วคราว", by: "วิภา รัตนชัย", dept: "ฝ่ายขาย", date: "20 ต.ค. 2569", status: "ไม่อนุมัติ", category: "แก้ปัญหา", progress: 0 },
   { id: "REQ-2611-016", title: "ขอพัฒนาระบบจัดการคลังสินค้า", by: "กิตติ ศรีสุข", dept: "ฝ่ายคลังสินค้า", date: "15 พ.ย. 2569", status: "รออนุมัติ", category: "พัฒนาใหม่", progress: 20 },

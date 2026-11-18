@@ -18,11 +18,12 @@ import { PENDING } from "./mock";
 
 type ApprovalDecision = {
   result: "ok" | "no";
+  decidedAt: string;
   comment?: string;
 };
 
 const EMPTY_DECISIONS: Record<string, ApprovalDecision> = {};
-// เก็บไว้ชั่วคราวในแท็บนี้ เปลี่ยนหน้าแล้วยังจำได้ แต่รีเฟรชแล้วจะกลับมาเริ่มใหม่
+// เก็บผลระหว่างเปลี่ยนหน้า แต่รีเฟรชแล้วเริ่มใหม่
 let decisions: Record<string, ApprovalDecision> = EMPTY_DECISIONS;
 const listeners = new Set<() => void>();
 
@@ -51,13 +52,24 @@ function saveDecision(requestId: string, decision: ApprovalDecision) {
 export default function ApprovalDashboard({
   approvedThisMonth,
   returnedThisMonth,
+  currentMonthYear,
 }: {
   approvedThisMonth: number;
   returnedThisMonth: number;
+  currentMonthYear: string;
 }) {
   const decisions = useApprovalDecisions();
   const pendingRequests = PENDING.filter(
     (request) => !decisions[request.id],
+  );
+  const formatMonthYear = (date: string) =>
+    new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
+      month: "short",
+      year: "numeric",
+      timeZone: "Asia/Bangkok",
+    }).format(new Date(date));
+  const currentMonthDecisions = Object.values(decisions).filter(
+    (decision) => formatMonthYear(decision.decidedAt) === currentMonthYear,
   );
   const summaries = [
     {
@@ -67,12 +79,18 @@ export default function ApprovalDashboard({
     },
     {
       label: "อนุมัติเดือนนี้",
-      count: approvedThisMonth,
+      count:
+        approvedThisMonth +
+        currentMonthDecisions.filter((decision) => decision.result === "ok")
+          .length,
       color: "bg-green-500",
     },
     {
       label: "ส่งกลับเดือนนี้",
-      count: returnedThisMonth,
+      count:
+        returnedThisMonth +
+        currentMonthDecisions.filter((decision) => decision.result === "no")
+          .length,
       color: "bg-[#3730A3]",
     },
   ];
@@ -149,12 +167,19 @@ export function ApprovalDecisionPanel({
 
   const approveRequest = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    saveDecision(requestId, { result: "ok" });
+    saveDecision(requestId, {
+      result: "ok",
+      decidedAt: new Date().toISOString(),
+    });
   };
 
   const returnRequest = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    saveDecision(requestId, { result: "no", comment });
+    saveDecision(requestId, {
+      result: "no",
+      comment,
+      decidedAt: new Date().toISOString(),
+    });
   };
 
   return (
@@ -185,7 +210,16 @@ export function ApprovalDecisionPanel({
         </div>
       ) : isReturning ? (
         <form onSubmit={returnRequest} className="space-y-4">
-          <h3 className="font-semibold">ระบุข้อความที่ต้องการให้แก้ไข</h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-semibold">ระบุข้อความที่ต้องการให้แก้ไข</h3>
+            <button
+              type="button"
+              onClick={() => setIsReturning(false)}
+              className="text-sm font-medium text-brand underline underline-offset-4 hover:text-brand-strong"
+            >
+              ย้อนกลับ
+            </button>
+          </div>
           <Field label="รายละเอียดที่ต้องแก้ไข">
             <textarea
               value={comment}

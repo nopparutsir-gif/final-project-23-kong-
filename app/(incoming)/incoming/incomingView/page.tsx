@@ -18,17 +18,9 @@ import {
 } from "../../../../components/tailgrids/RequestUI";
 import CategoryTag from "../../../../components/tailgrids/CategoryTag";
 import StatusTag from "../../../../components/tailgrids/StatusTag";
+import { TaskAssigneeCombobox } from "./AssignmentControls";
 import { CompleteIncomingLink } from "../IncomingDashboard";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxInput,
-  ComboboxInputWrapper,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-} from "../../../../components/tailgrids/core/combobox";
-import { INCOMING, TEAM } from "../mock";
+import { INCOMING } from "../mock";
 
 // หน้ารายละเอียดสำหรับรับคำขอและวางแผนแบ่งงานให้ทีม จากปุ่มใน incoming/page.tsx
 export default function IncomingViewPage({
@@ -44,19 +36,9 @@ export default function IncomingViewPage({
 async function IncomingViewContent({
   searchParams,
 }: Pick<PageProps<"/incoming/incomingView">, "searchParams">) {
-  // อ่านรหัสคำขอและทีมที่เลือกจากลิงก์ เพื่อเปิดหน้ากลับมาแล้วยังเห็นตัวเลือกเดิม
-  const { id, team: teamParam } = await searchParams;
+  const { id } = await searchParams;
   const requestId = typeof id === "string" ? id : undefined;
   const request = INCOMING.find((item) => item.id === requestId);
-  const teamValues: string[] =
-    typeof teamParam === "string"
-      ? [teamParam]
-      : Array.isArray(teamParam)
-        ? teamParam
-        : [];
-  const selectedTeams = new Set<string>(
-    teamValues.filter((team: string) => RESPONSIBLE_TEAMS.includes(team)),
-  );
 
   if (!request) notFound();
 
@@ -85,10 +67,7 @@ async function IncomingViewContent({
           </span>
         </p>
       </Card>
-      <TaskBreakdownCard
-        requestId={request.id}
-        selectedTeams={selectedTeams}
-      />
+      <TaskBreakdownCard requestId={request.id} />
     </>
   );
 }
@@ -122,50 +101,24 @@ const TEAM_WORKLOAD = [
   { name: "ณัฐพล ทองดี", tasks: 1, progress: 20 },
 ];
 
-const RESPONSIBLE_TEAMS = ["ทีมพัฒนาระบบขาย", "ทีมโครงสร้างพื้นฐาน"];
-
-// แสดงรายชื่อสมาชิกจาก mock.ts ให้เลือกเป็นผู้รับผิดชอบงานย่อย
-function TeamCombobox() {
-  return (
-    <Combobox>
-      <ComboboxInputWrapper>
-        <ComboboxInput placeholder="เลือกผู้รับผิดชอบงาน" />
-        <ComboboxTrigger />
-      </ComboboxInputWrapper>
-      <ComboboxContent>
-        <ComboboxList emptyMessage="ไม่พบสมาชิกในทีม">
-          {TEAM.map((member) => (
-            <ComboboxItem key={member} id={member}>
-              {member}
-            </ComboboxItem>
-          ))}
-        </ComboboxList>
-      </ComboboxContent>
-    </Combobox>
-  );
-}
-
-function TaskBreakdownCard({
-  requestId,
-  selectedTeams,
-}: {
-  requestId: string;
-  selectedTeams: Set<string>;
-}) {
-  // เมื่อกดชื่อทีม จะเพิ่มหรือนำทีมนั้นออกจากลิงก์ เพื่อแสดงว่าเลือกทีมใดไว้
-  const getTeamHref = (team: string) => {
-    const nextSelected = new Set(selectedTeams);
-    if (nextSelected.has(team)) {
-      nextSelected.delete(team);
-    } else {
-      nextSelected.add(team);
-    }
-
-    const params = new URLSearchParams({ id: requestId });
-    nextSelected.forEach((selectedTeam) => params.append("team", selectedTeam));
-    return `/incoming/incomingView?${params.toString()}`;
+function getTodayDateInputValue() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Bangkok",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const getPart = (type: "year" | "month" | "day") => {
+    const value = parts.find((part) => part.type === type)?.value;
+    if (!value) throw new Error(`Missing ${type} in current date.`);
+    return value;
   };
 
+  return `${getPart("year")}-${getPart("month")}-${getPart("day")}`;
+}
+
+function TaskBreakdownCard({ requestId }: { requestId: string }) {
+  const minDate = getTodayDateInputValue();
   return (
     <div className="mt-4 grid items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
       <Card className="min-w-0">
@@ -198,8 +151,7 @@ function TaskBreakdownCard({
                       <p className="text-sm text-slate-700">{subtask}</p>
                     </div>
                     <Field label="ผู้รับผิดชอบงาน">
-                      {/* ช่องเลือกและวันกำหนดเสร็จเป็นตัวอย่างหน้าจอ ยังไม่ได้บันทึกข้อมูล */}
-                      <TeamCombobox />
+                      <TaskAssigneeCombobox assignmentId={subtask} />
                     </Field>
                     <Field label="กำหนดเสร็จ">
                       <div className="relative">
@@ -211,6 +163,7 @@ function TaskBreakdownCard({
                         <input
                           type="date"
                           className="input pl-10"
+                          min={minDate}
                           aria-label={`กำหนดเสร็จ งานย่อย ${index + 1}`}
                         />
                       </div>
@@ -265,28 +218,7 @@ function TaskBreakdownCard({
           </div>
         </Card>
 
-        <Card>
-          <h2 className="font-semibold">ทีมที่รับผิดชอบ</h2>
-          <div className="flex flex-nowrap items-center gap-2">
-            {RESPONSIBLE_TEAMS.map((team) => {
-              const isSelected = selectedTeams.has(team);
-
-              return (
-                <Link
-                  key={team}
-                  href={getTeamHref(team)}
-                  aria-current={isSelected ? "true" : undefined}
-                  className={`inline-flex whitespace-nowrap rounded-full border px-2.5 py-1.5 text-xs font-medium transition ${
-                    isSelected
-                      ? "border-[#4338CA] bg-[#4338CA] text-white hover:bg-[#3730A3]"
-                      : "border-[#4338CA] bg-white text-[#4338CA] hover:bg-[#EEF2FF]"
-                  }`}
-                >
-                  {team}
-                </Link>
-              );
-            })}
-          </div>
+        <Card className="flex flex-col gap-2">
           <div className="flex flex-col gap-2">
             {/* ยืนยันรับงานแล้วกลับไปหน้ารายการ ซึ่งจะซ่อนคำขอนี้ชั่วคราว */}
             <CompleteIncomingLink requestId={requestId} />

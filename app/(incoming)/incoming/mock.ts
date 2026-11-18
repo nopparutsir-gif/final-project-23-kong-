@@ -15,7 +15,7 @@ interface IncomingRequest {
   detail: string;
 }
 
-interface DepartmentRequest {
+export interface DepartmentRequest {
   id: string;
   title: string;
   owner: string;

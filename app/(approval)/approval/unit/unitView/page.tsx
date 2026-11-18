@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import CategoryTag from "../../../../../components/tailgrids/CategoryTag";
-import StatusTag from "../../../../../components/tailgrids/StatusTag";
 import {
   Card,
   Detail,
   PageHeader,
 } from "../../../../../components/tailgrids/RequestUI";
 import ProgressControl from "../../../../../components/tailgrids/ProgressControl";
+import ProgressStatusTag from "../../../../../components/tailgrids/ProgressStatusTag";
 import { IN_UNIT } from "../../mock";
 
 // หน้าแสดงข้อมูลและความคืบหน้าของคำขอที่เลือกจาก unit/page.tsx
@@ -40,7 +40,11 @@ async function UnitViewContent({
             <div className="flex flex-wrap items-center gap-2">
               <p className="table__id">{request.id}</p>
               <CategoryTag category={request.category} />
-              <StatusTag status={request.status} />
+              <ProgressStatusTag
+                requestId={request.id}
+                initialStatus={request.status}
+                initialProgress={request.progress}
+              />
             </div>
             <h2 className="mt-1 text-lg font-semibold">{request.title}</h2>
           </div>

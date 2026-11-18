@@ -30,6 +30,7 @@ async function ApprovalsContent() {
     <ApprovalDashboard
       approvedThisMonth={countThisMonth("อนุมัติแล้ว")}
       returnedThisMonth={countThisMonth("ไม่อนุมัติ")}
+      currentMonthYear={currentMonthYear}
     />
   );
 }

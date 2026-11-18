@@ -2,11 +2,9 @@ import { Suspense } from "react";
 import CategoryFilter, {
   CATEGORY_OPTIONS,
 } from "../../../../components/tailgrids/CategoryFilter";
-import CategoryTag from "../../../../components/tailgrids/CategoryTag";
-import ProgressControl from "../../../../components/tailgrids/ProgressControl";
-import { PageHeader, Table } from "../../../../components/tailgrids/RequestUI";
-import StatusTag from "../../../../components/tailgrids/StatusTag";
+import { PageHeader } from "../../../../components/tailgrids/RequestUI";
 import { IN_DEPT } from "../mock";
+import DepartmentRequestsTable from "./DepartmentRequestsTable";
 
 // หน้ารวมงานที่อยู่ในความดูแลของแผนก เลือกดูตามหมวดและสถานะได้
 export default function DepartmentRequestsPage({
@@ -41,20 +39,6 @@ async function DepartmentRequestsContent({
     completionParam === "unfinished" || completionParam === "done"
       ? completionParam
       : null;
-  // แสดงเฉพาะงานที่ตรงกับตัวกรองที่เลือก
-  const categoryFilteredRequests =
-    selectedCategories.length === 0
-      ? IN_DEPT
-      : IN_DEPT.filter((request) =>
-          selectedCategories.includes(request.category)
-        );
-  const requests = categoryFilteredRequests.filter((request) =>
-    selectedStatus === "done"
-      ? request.status === "เสร็จสิ้น"
-      : selectedStatus === "unfinished"
-        ? request.status !== "เสร็จสิ้น"
-        : true
-  );
 
   return (
     <>
@@ -72,38 +56,11 @@ async function DepartmentRequestsContent({
         selectedCategories={selectedCategories}
         selectedStatus={selectedStatus}
       />
-      <Table
-        cols={[
-          "เรื่อง",
-          "หมวด",
-          "ผู้ขอ",
-          "สถานะ",
-          "ความคืบหน้า",
-          "อัปเดต",
-        ]}
-      >
-        {requests.map((request) => (
-          <tr key={request.id}>
-            <td>
-              <div className="font-medium">{request.title}</div>
-              <div className="mt-1 text-xs text-slate-500">
-                {request.id}
-              </div>
-            </td>
-            <td>
-              <CategoryTag category={request.category} />
-            </td>
-            <td>{request.owner}</td>
-            <td>
-              <StatusTag status={request.status} />
-            </td>
-            <td>
-              <ProgressControl initialProgress={request.progress} />
-            </td>
-            <td>{request.date}</td>
-          </tr>
-        ))}
-      </Table>
+      <DepartmentRequestsTable
+        requests={IN_DEPT}
+        selectedCategories={selectedCategories}
+        selectedStatus={selectedStatus}
+      />
     </>
   );
 }

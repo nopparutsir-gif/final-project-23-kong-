@@ -12,6 +12,16 @@ const ProgressContext = createContext<ProgressContextValue | null>(null);
 const getNextProgress = (currentProgress: number) =>
   currentProgress >= 100 ? 0 : Math.min(currentProgress + 20, 100);
 
+export const getProgressStatus = (
+  initialStatus: string,
+  initialProgress: number,
+  currentProgress?: number
+) => {
+  if (currentProgress === undefined) return initialStatus;
+  if (currentProgress >= 100) return "เสร็จสิ้น";
+  return initialProgress >= 100 ? "กำลังดำเนินการ" : initialStatus;
+};
+
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const [values, setValues] = useState<Record<string, number>>({});
   const advanceProgress = (requestId: string, initialProgress: number) => {
@@ -28,6 +38,16 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       {children}
     </ProgressContext.Provider>
   );
+}
+
+export function useProgress() {
+  const progressContext = useContext(ProgressContext);
+
+  if (!progressContext) {
+    throw new Error("useProgress must be used inside ProgressProvider.");
+  }
+
+  return progressContext;
 }
 
 export default function ProgressControl({

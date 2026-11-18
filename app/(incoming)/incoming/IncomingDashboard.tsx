@@ -12,6 +12,7 @@ import { Card, PageHeader } from "../../../components/tailgrids/RequestUI";
 import LinkButton from "../../../components/tailgrids/LinkButton";
 import CategoryTag from "../../../components/tailgrids/CategoryTag";
 import { INCOMING, IN_DEPT } from "./mock";
+import { useTaskAssignments } from "./incomingView/AssignmentControls";
 
 const EMPTY_COMPLETED_IDS: ReadonlySet<string> = new Set();
 let completedIds: ReadonlySet<string> = EMPTY_COMPLETED_IDS;
@@ -44,14 +45,35 @@ export function CompleteIncomingLink({
 }: {
   requestId: string;
 }) {
+  const { hasAssignee } = useTaskAssignments();
+  const content = (
+    <>
+      <Check size={18} aria-hidden="true" />
+      ยืนยันรับงานและมอบหมาย
+    </>
+  );
+  const className =
+    "inline-flex w-full items-center justify-center gap-3 rounded-lg bg-[#4338CA] px-4 py-2.5 font-medium text-white transition hover:bg-[#3730A3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4338CA]";
+
+  if (!hasAssignee) {
+    return (
+      <button
+        type="button"
+        disabled
+        className={`${className} cursor-not-allowed opacity-50`}
+      >
+        {content}
+      </button>
+    );
+  }
+
   return (
     <Link
       href="/incoming"
       onClick={() => markIncomingDone(requestId)}
-      className="inline-flex w-full items-center justify-center gap-3 rounded-lg bg-[#4338CA] px-4 py-2.5 font-medium text-white transition hover:bg-[#3730A3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4338CA]"
+      className={className}
     >
-      <Check size={18} aria-hidden="true" />
-      ยืนยันรับงานและมอบหมาย
+      {content}
     </Link>
   );
 }
