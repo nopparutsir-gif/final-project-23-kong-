@@ -8,7 +8,7 @@ import {
   Detail,
   PageHeader,
 } from "../../../../components/tailgrids/RequestUI";
-import { ApprovalDecisionPanel } from "../ApprovalDashboard";
+import { ApprovalDecisionPanel } from "./ApprovalDashboard";
 import { PENDING } from "../mock";
 
 // หน้ารายละเอียดที่เปิดจากปุ่ม "พิจารณา" ใน approval/page.tsx

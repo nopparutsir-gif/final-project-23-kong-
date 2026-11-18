@@ -19,7 +19,7 @@ import {
 import CategoryTag from "../../../../components/tailgrids/CategoryTag";
 import StatusTag from "../../../../components/tailgrids/StatusTag";
 import { TaskAssigneeCombobox } from "./AssignmentControls";
-import { CompleteIncomingLink } from "../IncomingDashboard";
+import { CompleteIncomingLink } from "./IncomingDashboard";
 import { INCOMING } from "../mock";
 
 // หน้ารายละเอียดสำหรับรับคำขอและวางแผนแบ่งงานให้ทีม จากปุ่มใน incoming/page.tsx

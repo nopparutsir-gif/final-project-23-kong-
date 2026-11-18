@@ -16,7 +16,7 @@ import {
 } from "../../../../components/tailgrids/core/combobox";
 import CategoryTag from "../../../../components/tailgrids/CategoryTag";
 import StatusTag from "../../../../components/tailgrids/StatusTag";
-import { markIncomingDone } from "../IncomingDashboard";
+import { markIncomingDone } from "../incomingView/IncomingDashboard";
 import { FORWARD_TO, INCOMING } from "../mock";
 
 // หน้าปฏิเสธหรือส่งต่อคำขอ จำตัวเลือกและข้อความที่กรอกไว้ระหว่างใช้งาน

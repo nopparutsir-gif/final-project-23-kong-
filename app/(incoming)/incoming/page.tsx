@@ -1,4 +1,4 @@
-import IncomingDashboard from "./IncomingDashboard";
+import IncomingDashboard from "./incomingView/IncomingDashboard";
 
 // หน้าแรกของคำขอเข้าแผนก แสดงคำขอที่ส่งมาถึงและทางเลือกจัดการแต่ละคำขอ
 export default function IncomingPage() {

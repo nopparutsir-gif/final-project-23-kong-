@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import ApprovalDashboard from "./ApprovalDashboard";
+import ApprovalDashboard from "./approvalsView/ApprovalDashboard";
 import { IN_UNIT } from "./mock";
 
 // หน้าแรกของงานอนุมัติ แสดงจำนวนงานและรายการที่รอหัวหน้าพิจารณา
